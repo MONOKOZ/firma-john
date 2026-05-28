@@ -7,6 +7,12 @@ import {
   User,
   signOut
 } from "firebase/auth";
+import { 
+  getStorage, 
+  ref, 
+  uploadBytes, 
+  getDownloadURL 
+} from "firebase/storage";
 import firebaseConfig from "../../firebase-applet-config.json";
 import { TeamMember, HistoryMilestone, ServiceCategory, JobVacancy } from "../types";
 
@@ -21,15 +27,41 @@ import {
 // Initialize Firebase App safely to prevent top-level module evaluation crashes
 let app: any = null;
 let auth: any = null;
+let storage: any = null;
 try {
   const config = (firebaseConfig && typeof firebaseConfig === 'object' && 'default' in firebaseConfig) 
     ? (firebaseConfig as any).default 
     : firebaseConfig;
   app = getApps().length > 0 ? getApp() : initializeApp(config);
   auth = getAuth(app);
+  storage = getStorage(app);
 } catch (e: any) {
-  console.error("Firebase App or Auth initialization failed:", e);
+  console.error("Firebase App, Auth or Storage initialization failed:", e);
 }
+
+export { storage };
+
+export const uploadTeamPhoto = async (file: File): Promise<string> => {
+  if (!storage) {
+    throw new Error("Firebase Storage ist nicht verfügbar oder die Konfiguration fehlt.");
+  }
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Bitte wählen Sie nur Bilddateien (JPEG/PNG) aus.");
+  }
+  // Max size check: 5MB
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error("Die Bilddatei ist zu groß (maximal 5 MB erlaubt).");
+  }
+
+  const fileExt = file.name.split(".").pop() || "jpg";
+  const timestamp = Date.now();
+  const safeName = file.name.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 30);
+  const storageRef = ref(storage, `team-photos/${timestamp}_${safeName}.${fileExt}`);
+  
+  const snapshot = await uploadBytes(storageRef, file);
+  const downloadUrl = await getDownloadURL(snapshot.ref);
+  return downloadUrl;
+};
 
 const provider = new GoogleAuthProvider();
 provider.addScope("https://www.googleapis.com/auth/spreadsheets");
