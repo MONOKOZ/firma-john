@@ -3,10 +3,11 @@ import {
   Database, FileSpreadsheet, LogIn, LogOut, CheckCircle2, 
   RotateCw, RefreshCw, Layers, ExternalLink, HelpCircle, 
   Settings, Sparkles, Building2, MapPin, Phone, Mail, Clock, AlertTriangle,
-  Plus, Trash2, Image, UserPlus, Briefcase, Calendar, Save, Info, BookOpen
+  Plus, Trash2, Image, UserPlus, Briefcase, Calendar, Save, Info, BookOpen,
+  Upload
 } from "lucide-react";
 import { useCMS, CMSProvider } from "../context/CMSContext";
-import { googleSignIn, createCMS_Sheet, logout } from "../lib/googleSheets";
+import { googleSignIn, createCMS_Sheet, logout, uploadTeamPhoto } from "../lib/googleSheets";
 
 export function AdminDashboard() {
   const { 
@@ -38,6 +39,29 @@ export function AdminDashboard() {
   const [cmsDraft, setCmsDraft] = useState<any>(null);
   const [activeCmsTab, setActiveCmsTab] = useState<"general" | "services" | "team" | "history" | "jobs">("general");
   const [isSavingDraft, setIsSavingDraft] = useState<boolean>(false);
+
+  // Storage Photo upload state
+  const [uploadingIndices, setUploadingIndices] = useState<Record<number, boolean>>({});
+  const [uploadErrors, setUploadErrors] = useState<Record<number, string>>({});
+
+  const handlePhotoUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingIndices(prev => ({ ...prev, [index]: true }));
+    setUploadErrors(prev => ({ ...prev, [index]: "" }));
+
+    try {
+      const downloadUrl = await uploadTeamPhoto(file);
+      updateTeamMember(index, "imageUrl", downloadUrl);
+      setFeedbackMsg(`🎉 Foto für "${cmsDraft?.team?.[index]?.name || "Team-Mitglied"}" erfolgreich in Firebase Storage hochgeladen! Drücken Sie unten auf "Änderungen speichern", um es dauerhaft zu machen.`);
+    } catch (err: any) {
+      console.error(err);
+      setUploadErrors(prev => ({ ...prev, [index]: err.message || "Fehler beim Upload" }));
+    } finally {
+      setUploadingIndices(prev => ({ ...prev, [index]: false }));
+    }
+  };
 
   React.useEffect(() => {
     if (allgemeines && !cmsDraft) {
@@ -1147,16 +1171,38 @@ export function AdminDashboard() {
                                 </div>
 
                                 <div className="space-y-1">
-                                  <label className="font-mono text-[9px] uppercase text-stone-400 font-bold">Foto-Dateipfad oder Internet-Bildlink (URL)</label>
-                                  <input
-                                    type="text"
-                                    value={member.imageUrl || ""}
-                                    onChange={(e) => updateTeamMember(mIdx, "imageUrl", e.target.value)}
-                                    placeholder="https://images.unsplash.com/photo-..."
-                                    className="w-full text-xs font-mono px-3 py-2 bg-white border border-stone-200 rounded-lg focus:border-[#ff4c00] outline-none"
-                                  />
+                                  <label className="font-mono text-[9px] uppercase text-stone-400 font-bold">Foto-Dateipfad, Internet-Bildlink oder Upload</label>
+                                  <div className="flex gap-2">
+                                    <input
+                                      type="text"
+                                      value={member.imageUrl || ""}
+                                      onChange={(e) => updateTeamMember(mIdx, "imageUrl", e.target.value)}
+                                      placeholder="https://images.unsplash.com/photo-..."
+                                      className="flex-1 text-xs font-mono px-3 py-2 bg-white border border-stone-200 rounded-lg focus:border-[#ff4c00] outline-none"
+                                    />
+                                    <label className="inline-flex items-center justify-center px-4 bg-[#121315] hover:bg-black text-white rounded-lg font-extrabold text-[10px] uppercase tracking-wider transition-colors cursor-pointer shrink-0 select-none">
+                                      {uploadingIndices[mIdx] ? (
+                                        <RotateCw className="w-3.5 h-3.5 animate-spin mr-1" />
+                                      ) : (
+                                        <Upload className="w-3.5 h-3.5 mr-1" />
+                                      )}
+                                      <span>{uploadingIndices[mIdx] ? "Upload..." : "Hochladen"}</span>
+                                      <input
+                                        type="file"
+                                        accept="image/*"
+                                        disabled={uploadingIndices[mIdx]}
+                                        onChange={(e) => handlePhotoUpload(mIdx, e)}
+                                        className="hidden"
+                                      />
+                                    </label>
+                                  </div>
+                                  {uploadErrors[mIdx] && (
+                                    <div className="text-[10px] text-red-500 font-bold mt-1">
+                                      ⚠️ {uploadErrors[mIdx]}
+                                    </div>
+                                  )}
                                   <span className="text-[8px] leading-normal font-medium text-stone-400 block mt-1 uppercase font-mono">
-                                    💡 Perfektes Bildformat: Vertikal 600 × 750px (Weite:Höhe ratio 4:5)
+                                    💡 Perfektes Bildformat: Vertikal 600 × 750px (Weite:Höhe ratio 4:5). Bilder werden sicher per Firebase Storage gespeichert.
                                   </span>
                                 </div>
                               </div>
