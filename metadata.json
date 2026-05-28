@@ -1,0 +1,8 @@
+{
+  "name": "Firma JOHN – V2",
+  "description": "Premium Redesign for Firma JOHN — Gas, Wasser, Heizung, Sanitär, Lüftung \u0026 Solar in Ludwigsfelde",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,28 @@
+---
+import '../index.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { 
+  title = "Firma JOHN | Gas · Wasser · Heizung · Sanitär Ludwigsfelde",
+  description = "Premium Redesign for Firma JOHN — Gas, Wasser, Heizung, Sanitär, Lüftung & Solar in Ludwigsfelde"
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="de" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-[#fafaf7] text-[#121315] selection:bg-[#ff4c00]/10 selection:text-[#ff4c00] font-sans overflow-x-hidden antialiased flex flex-col justify-between">
+    <slot />
+  </body>
+</html>
