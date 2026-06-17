@@ -43,3 +43,12 @@ export interface JobVacancy {
   requirements: string[];
   benefits: string[];
 }
+
+/** Gesamter editierbarer Seiteninhalt (eine Struktur über alle 5 Sheet-Tabs). */
+export interface CMSContent {
+  allgemeines: Record<string, string>;
+  team: TeamMember[];
+  historie: HistoryMilestone[];
+  dienstleistungen: ServiceCategory[];
+  jobs: JobVacancy[];
+}
