@@ -1,20 +1,28 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# firma-john
 
-# Run and deploy your AI Studio app
+Statische **Astro**-Website (SSG) mit **Google Sheets als CMS**. React (React 19) wird nur auf `/admin` geladen (`client:only`); die Startseite verschickt kein React. Styling via Tailwind 4, Auth/Storage via Firebase.
 
-This contains everything you need to run your app locally.
+> Diese Codebasis wird zu einem deploy-neutralen Master-CMS umgebaut (Cloudflare-Standard, Vercel-Premium-Opt-in). Architektur & Milestones siehe Handoff-Dokument `KONZEPT_v2-Architektur_Claude-Code-Handoff.md`.
 
-View your app in AI Studio: https://ai.studio/apps/bb2eb3ee-3691-482e-9413-baaee32f804c
+## Lokal starten
 
-## Run Locally
+**Voraussetzung:** Node.js
 
-**Prerequisites:**  Node.js
+```bash
+npm install
+npm run dev      # http://localhost:3000
+```
 
+## Skripte
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+| Befehl | Zweck |
+|---|---|
+| `npm run dev` | Dev-Server (Port 3000) |
+| `npm run build` | Produktions-Build nach `dist/` |
+| `npm run preview` | Build lokal vorschauen |
+| `npm run lint` | `tsc --noEmit` (Typprüfung) |
+| `npm run clean` | `dist/` + `.astro/` löschen |
+
+## Environment
+
+Siehe `.env.example`. Secrets (Service Account, Deploy-Hook, Firebase-Admin) gehören in die Plattform-Env (Cloudflare/Vercel) — **nie ins Repo**.
