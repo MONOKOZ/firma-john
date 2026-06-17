@@ -1,6 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { TEAM_MEMBERS, HISTORY_MILESTONES, SERVICE_CATEGORIES, JOB_VACANCIES, DEFAULT_ALLGEMEIN } from '../data';
+import { getContent } from '../lib/sheets/read';
+
+// Build-Zeit: echte Sheet-Inhalte via Service Account; Fallback auf data.ts-Defaults.
+const content = await getContent();
+const DEFAULT_ALLGEMEIN = content.allgemeines;
+const TEAM_MEMBERS = content.team;
+const HISTORY_MILESTONES = content.historie;
+const SERVICE_CATEGORIES = content.dienstleistungen;
+const JOB_VACANCIES = content.jobs;
 ---
 
 <Layout title="Firma JOHN | Gas · Wasser · Heizung · Sanitär Ludwigsfelde">
