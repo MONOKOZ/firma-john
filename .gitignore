@@ -11,3 +11,10 @@ coverage/
 # Service-Account-Schlüssel (lokal) — NIE committen
 .secrets/*
 !.secrets/README.md
+
+# Cloudflare lokale Dev-Secrets — NIE committen
+.dev.vars
+.dev.vars.*
+
+# Wrangler/miniflare lokaler State & Cache
+.wrangler/

@@ -11,13 +11,14 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^13.7.0",
     "@astrojs/react": "^5.0.5",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "astro": "^6.3.8",
     "dotenv": "^17.2.3",
     "firebase": "^12.13.0",
-    "google-auth-library": "^10.7.0",
+    "jose": "^6.2.3",
     "lucide-react": "^0.546.0",
     "motion": "^12.23.24",
     "react": "^19.0.1",
