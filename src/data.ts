@@ -1,4 +1,20 @@
-import { ServiceCategory, TeamMember, HistoryMilestone, JobVacancy } from "./types";
+import { ServiceCategory, TeamMember, HistoryMilestone, JobVacancy, CMSContent } from "./types";
+
+/**
+ * DEFAULT_ALLGEMEIN — Seed/Fallback der Key-Value-Inhalte.
+ * Einzige Quelle (vorher 4× dupliziert: googleSheets-const, populate, write, index.astro).
+ */
+export const DEFAULT_ALLGEMEIN: Record<string, string> = {
+  contact_phone: "03378 801127",
+  contact_email: "info@john-haustechnik.de",
+  contact_address: "Dornweg 14, 14974 Ludwigsfelde",
+  contact_hours: "Mo - Do: 07:00 - 16:30 Uhr | Fr: 07:00 - 14:00 Uhr",
+  notdienst_phone: "0172 3004050",
+  hero_title: "Meisterliche Haustechnik für Bad & Heizung",
+  hero_subtitle: "Seit 1981 der ehrliche & verlässliche Fachbetrieb in Ludwigsfelde. Wir planen moderne Wärmepumpen, gestalten barrierefreie Bäder und reparieren dichte Rohrnetze zur vollsten Zufriedenheit.",
+  experience_stat: "45 Jahre",
+  success_stat: "100%"
+};
 
 export const TEAM_MEMBERS: TeamMember[] = [
   {
@@ -285,3 +301,16 @@ export const JOB_VACANCIES: JobVacancy[] = [
     ]
   }
 ];
+
+/**
+ * DEFAULT_CONTENT — vollständiger Seed über alle Tabs.
+ * Dient der Engine als Fallback (leere Sektion) und als Service-Styling-Quelle
+ * (iconName/colorTheme stehen nicht im Sheet) sowie beim Seeden eines neuen Sheets.
+ */
+export const DEFAULT_CONTENT: CMSContent = {
+  allgemeines: DEFAULT_ALLGEMEIN,
+  team: TEAM_MEMBERS,
+  historie: HISTORY_MILESTONES,
+  dienstleistungen: SERVICE_CATEGORIES,
+  jobs: JOB_VACANCIES
+};
