@@ -62,9 +62,13 @@ export interface SheetBlock { range: string; values: Matrix; }
 
 /**
  * Baut die vollständige batchUpdate-Payload (Header + Daten je Tab).
- * Wird sowohl beim Seed (Default-Daten) als auch beim normalen Speichern genutzt.
+ * Wird beim Seed (Default-Daten) und beim Speichern genutzt.
+ *
+ * `padRows > 0`: füllt jeden Tab mit Leerzeilen bis `padRows` auf → ein einziger
+ * atomarer batchUpdate überschreibt auch alte Restzeilen (kein separates batchClear
+ * nötig; erfüllt die M4-Atomaritäts-Anforderung).
  */
-export function buildSheetPayload(content: CMSContent): SheetBlock[] {
+export function buildSheetPayload(content: CMSContent, padRows = 0): SheetBlock[] {
   const blocks: { tab: string; values: Matrix }[] = [
     { tab: schema.allgemeines.sheetTab, values: encodeAllgemeines(content.allgemeines) },
     { tab: schema.dienstleistungen.sheetTab, values: encodeServices(content.dienstleistungen) },
@@ -72,8 +76,15 @@ export function buildSheetPayload(content: CMSContent): SheetBlock[] {
     { tab: schema.historie.sheetTab, values: encodeList(schema.historie, content.historie) },
     { tab: schema.jobs.sheetTab, values: encodeList(schema.jobs, content.jobs) },
   ];
-  return blocks.map((b) => ({
-    range: `'${b.tab}'!A1:${colLetter(b.values[0].length)}${b.values.length}`,
-    values: b.values,
-  }));
+  return blocks.map((b) => {
+    const cols = b.values[0].length;
+    const values = b.values.slice();
+    if (padRows > values.length) {
+      while (values.length < padRows) values.push(new Array(cols).fill(""));
+    }
+    return {
+      range: `'${b.tab}'!A1:${colLetter(cols)}${values.length}`,
+      values,
+    };
+  });
 }
