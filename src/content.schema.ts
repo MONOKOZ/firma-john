@@ -168,7 +168,7 @@ export const schema = {
     sheetTab: "Karriere",
     columns: [
       { key: "id", header: "ID", label: "ID", type: "text" },
-      { key: "title", header: "Stellenbezeichnung", label: "Stellenbezeichnung", type: "text", limit: 60 },
+      { key: "title", header: "Stellenbezeichnung", label: "Stellenbezeichnung", type: "text", limit: 90 },
       { key: "type", header: "Anstellung & Typ", label: "Anstellung & Typ", type: "text", limit: 40 },
       { key: "intro", header: "Einleitungssatz", label: "Einleitung", type: "longtext", limit: 250 },
       { key: "requirements", header: "Anforderungen (mit Semikolon ; trennen)", label: "Anforderungen", type: "list", listSeparator: ";" },
