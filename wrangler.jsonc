@@ -1,0 +1,6 @@
+{
+  "name": "firma-john",
+  "r2_buckets": [
+    { "binding": "UPLOADS", "bucket_name": "firma-john-uploads" }
+  ]
+}

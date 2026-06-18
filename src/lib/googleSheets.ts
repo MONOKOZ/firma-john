@@ -38,25 +38,24 @@ try {
 export { storage };
 
 export const uploadTeamPhoto = async (file: File): Promise<string> => {
-  if (!storage) {
-    throw new Error("Firebase Storage ist nicht verfügbar oder die Konfiguration fehlt.");
-  }
   if (!file.type.startsWith("image/")) {
-    throw new Error("Bitte wählen Sie nur Bilddateien (JPEG/PNG) aus.");
+    throw new Error("Bitte wählen Sie nur Bilddateien (JPEG/PNG/WebP) aus.");
   }
   // Max size check: 5MB
   if (file.size > 5 * 1024 * 1024) {
     throw new Error("Die Bilddatei ist zu groß (maximal 5 MB erlaubt).");
   }
 
-  const fileExt = file.name.split(".").pop() || "jpg";
-  const timestamp = Date.now();
-  const safeName = file.name.replace(/[^a-zA-Z0-9]/g, "_").substring(0, 30);
-  const storageRef = ref(storage, `team-photos/${timestamp}_${safeName}.${fileExt}`);
-
-  const snapshot = await uploadBytes(storageRef, file);
-  const downloadUrl = await getDownloadURL(snapshot.ref);
-  return downloadUrl;
+  // Upload über den eigenen Worker-Endpunkt → Cloudflare R2 (same-origin, kein CORS).
+  const form = new FormData();
+  form.append("file", file);
+  const res = await fetch("/api/upload", { method: "POST", credentials: "same-origin", body: form });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({} as any));
+    throw new Error(data?.error || `Upload fehlgeschlagen (${res.status}).`);
+  }
+  const data = await res.json();
+  return data.url as string;
 };
 
 const provider = new GoogleAuthProvider();
