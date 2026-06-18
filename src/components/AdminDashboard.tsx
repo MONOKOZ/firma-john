@@ -1466,10 +1466,10 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
   }
 }
 
-export function AdminDashboardWithProvider() {
+export function AdminDashboardWithProvider({ userEmail }: { userEmail?: string }) {
   return (
     <ErrorBoundary>
-      <CMSProvider>
+      <CMSProvider userEmail={userEmail}>
         <AdminDashboard />
       </CMSProvider>
     </ErrorBoundary>

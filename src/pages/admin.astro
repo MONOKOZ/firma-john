@@ -1,6 +1,14 @@
 ---
+export const prerender = false;
+import { env } from "cloudflare:workers";
 import Layout from '../layouts/Layout.astro';
 import { AdminDashboardWithProvider } from '../components/AdminDashboard';
+import LoginScreen from '../components/LoginScreen';
+import { verifySessionToken, SESSION_COOKIE } from '../lib/auth/session';
+
+const e = env as any;
+const cookie = Astro.cookies.get(SESSION_COOKIE)?.value;
+const session = cookie ? await verifySessionToken(cookie, e.SESSION_SECRET) : null;
 ---
 
 <Layout title="Meister-Backend // Firma JOHN">
@@ -12,7 +20,10 @@ import { AdminDashboardWithProvider } from '../components/AdminDashboard';
       </a>
     </div>
 
-    <!-- Admin dashboard container wrapped in a single Client-Only React component to share context -->
-    <AdminDashboardWithProvider client:only="react" />
+    <!-- SSR-Gate: gültige Session → Dashboard, sonst Login-Screen -->
+    {session
+      ? <AdminDashboardWithProvider client:only="react" userEmail={session.email} />
+      : <LoginScreen client:only="react" />
+    }
   </main>
 </Layout>
