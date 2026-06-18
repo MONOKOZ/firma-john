@@ -89,13 +89,37 @@ export function CMSProvider({ children, userEmail }: { children: React.ReactNode
       .finally(() => window.location.reload());
   }, []);
 
+  // Solange Content nicht geladen ist: Lade-/Fehler-Zustand statt Dashboard
+  // (verhindert das Rendern mit leerem Content → Object.keys-Crash).
+  if (!content) {
+    return (
+      <div className="max-w-md mx-auto text-center py-20 space-y-4">
+        {cmsError ? (
+          <>
+            <p className="text-sm font-bold text-red-600">{cmsError}</p>
+            <button
+              onClick={() => refreshCMS()}
+              className="inline-flex items-center h-10 px-5 bg-[#121315] text-white rounded-full font-bold text-xs uppercase tracking-wider cursor-pointer"
+            >
+              Erneut versuchen
+            </button>
+          </>
+        ) : (
+          <>
+            <span className="inline-block w-6 h-6 border-2 border-stone-400 border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm font-semibold text-stone-500">Inhalte werden geladen…</p>
+          </>
+        )}
+      </div>
+    );
+  }
+
   const value: CMSContextType = {
-    // Bis geladen ist `allgemeines` undefined → AdminDashboard wartet mit dem Draft.
-    allgemeines: (content?.allgemeines as any),
-    team: content?.team ?? [],
-    historie: content?.historie ?? [],
-    dienstleistungen: content?.dienstleistungen ?? [],
-    jobs: content?.jobs ?? [],
+    allgemeines: content.allgemeines,
+    team: content.team,
+    historie: content.historie,
+    dienstleistungen: content.dienstleistungen,
+    jobs: content.jobs,
     isLoadingCMS,
     isCMSEnabled: true,
     spreadsheetId: "server",
