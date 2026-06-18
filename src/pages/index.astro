@@ -1,9 +1,12 @@
 ---
+export const prerender = false; // SSR: bei jedem Aufruf live aus dem Sheet rendern
+import { env } from "cloudflare:workers";
 import Layout from '../layouts/Layout.astro';
 import { getContent } from '../lib/sheets/read';
 
-// Build-Zeit: echte Sheet-Inhalte via Service Account; Fallback auf data.ts-Defaults.
-const content = await getContent();
+// SSR: echte Sheet-Inhalte live lesen; Cloudflare-Env (Dashboard-Secrets bzw. .dev.vars
+// lokal) durchreichen. Fallback: data.ts (DEFAULT_CONTENT).
+const content = await getContent(env as any);
 const DEFAULT_ALLGEMEIN = content.allgemeines;
 const TEAM_MEMBERS = content.team;
 const HISTORY_MILESTONES = content.historie;
