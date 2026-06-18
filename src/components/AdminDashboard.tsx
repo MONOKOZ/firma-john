@@ -322,6 +322,13 @@ export function AdminDashboard() {
     }
   };
 
+  // Inhalte frisch aus dem Sheet einlesen (z. B. falls direkt im Sheet editiert wurde).
+  const handleReload = async () => {
+    if (isCmsDirty && !window.confirm("Ungespeicherte Änderungen gehen verloren. Inhalte wirklich neu aus dem Sheet laden?")) return;
+    await refreshCMS();
+    setCmsDraft(null); // löst den Sync-Effekt aus → Formular zeigt die frischen Sheet-Werte
+  };
+
   // Character counter view helper
   const CharacterCount = ({ current, limit, idealMin, idealMax }: { current: number; limit: number; idealMin?: number; idealMax?: number }) => {
     const isOverLimit = current > limit;
@@ -606,27 +613,11 @@ export function AdminDashboard() {
                   </div>
 
                   <div className="flex flex-wrap items-center gap-6 pt-2">
-                    <a 
-                      href={`https://docs.google.com/spreadsheets/d/${spreadsheetId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center text-xs font-extrabold text-[#ff4c00] hover:underline"
-                    >
-                      <FileSpreadsheet className="w-4 h-4 mr-2" /> Google Sheets öffnen <ExternalLink className="w-3 h-3 ml-1" />
-                    </a>
-                    
-                    <button 
+                    <button
                       onClick={() => setShowHowTo(!showHowTo)}
                       className="inline-flex items-center text-xs font-semibold text-stone-500 hover:text-black cursor-pointer"
                     >
                       <HelpCircle className="w-4 h-4 mr-1.5" /> {showHowTo ? "Anleitung ausblenden" : "Kurzanleitung anzeigen"}
-                    </button>
-
-                    <button 
-                      onClick={handleDisconnect}
-                      className="inline-flex items-center text-xs font-bold text-red-500 hover:text-red-700 ml-auto cursor-pointer"
-                    >
-                      Verknüpfung trennen
                     </button>
                   </div>
                 </div>
@@ -641,24 +632,24 @@ export function AdminDashboard() {
                       Inhalte neu einlesen
                     </h4>
                     <p className="text-stone-400 text-xs leading-relaxed font-semibold">
-                      Haben Sie Werte im Sheet abgeändert? Klicken Sie hier, um die Website sofort live zu aktualisieren.
+                      Direkt im Google Sheet etwas geändert? Hier neu einlesen, um die Formularfelder zu aktualisieren. (Speichern hier geht ohnehin sofort live.)
                     </p>
                   </div>
 
                   <button
-                    onClick={refreshCMS}
+                    onClick={handleReload}
                     disabled={isLoadingCMS}
                     className="w-full inline-flex items-center justify-center h-11 bg-[#ff4c00] hover:bg-[#ff4c00]/90 text-white rounded-full font-black text-[9.5px] uppercase tracking-widest transition-transform active:scale-95 disabled:opacity-50 cursor-pointer"
                   >
                     {isLoadingCMS ? (
                       <>
                         <RefreshCw className="w-3.5 h-3.5 mr-2 animate-spin" />
-                        Aktualisiere...
+                        Lade…
                       </>
                     ) : (
                       <>
                         <RefreshCw className="w-3.5 h-3.5 mr-2" />
-                        Jetzt Live Synchronisieren
+                        Vom Sheet neu laden
                       </>
                     )}
                   </button>
