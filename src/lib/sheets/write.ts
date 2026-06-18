@@ -6,7 +6,7 @@
  * - Dank SSR ist die Änderung sofort live (kein Rebuild/Deploy-Hook).
  */
 import { buildSheetPayload } from "./payload";
-import { validate, type ValidationError } from "./validate";
+import type { ValidationError } from "./validate";
 import type { CMSContent } from "../../types";
 import { resolveEnv, loadCredentials, getAccessToken, SCOPE_READWRITE, type EnvLike } from "./sa";
 
@@ -19,12 +19,10 @@ export interface WriteResult {
   errors?: ValidationError[];
 }
 
+// Layout-Schutz passiert CLIENT-seitig (maxLength + CharacterCount) + overflow-sicheres
+// Design — NICHT als harter Server-Gate. Limits dürfen den Publish nicht blockieren,
+// schon gar nicht wegen unveränderter Bestandsinhalte. (Limit-Feinschliff im Design-Rebuild.)
 export async function writeContent(content: CMSContent, runtimeEnv?: EnvLike): Promise<WriteResult> {
-  const errors = validate(content);
-  if (errors.length > 0) {
-    return { ok: false, status: 422, error: "Validierung fehlgeschlagen.", errors };
-  }
-
   const env = resolveEnv(runtimeEnv);
   const sheetId = env.SHEET_ID;
   const creds = loadCredentials(env);
