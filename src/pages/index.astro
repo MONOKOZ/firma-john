@@ -1,807 +1,339 @@
 ---
-export const prerender = false; // SSR: bei jedem Aufruf live aus dem Sheet rendern
-import { env } from "cloudflare:workers";
-import Layout from '../layouts/Layout.astro';
-import { getContent } from '../lib/sheets/read';
+export const prerender = true;
+import Base from '../layouts/Base.astro';
 
-// SSR: echte Sheet-Inhalte live lesen; Cloudflare-Env (Dashboard-Secrets bzw. .dev.vars
-// lokal) durchreichen. Fallback: data.ts (DEFAULT_CONTENT).
-const content = await getContent(env as any);
-const DEFAULT_ALLGEMEIN = content.allgemeines;
-const TEAM_MEMBERS = content.team;
-const HISTORY_MILESTONES = content.historie;
-const SERVICE_CATEGORIES = content.dienstleistungen;
-const JOB_VACANCIES = content.jobs;
+const leistungen = [
+  { slug: 'sanitaer', titel: 'Sanitär', img: 'sanitaer', text: 'Barrierefreie Bäder, Duschen, Armaturen — geplant wie für die eigene Familie.' },
+  { slug: 'wasser', titel: 'Wasser', img: 'wasser', text: 'Versorgung, Aufbereitung, Gartenbewässerung — sauber installiert, sicher.' },
+  { slug: 'heizung', titel: 'Heizung', img: 'heizung', text: 'Wärmepumpe, Brennwert, Pellets, Solar — effizient heizen, Förderung inklusive.' },
+  { slug: 'gas', titel: 'Gas', img: 'gas', text: 'Gasanlagen, Hausanschluss, Sicherheitstechnik — geprüft und zuverlässig.' },
+  { slug: 'klima-lueftung', titel: 'Klima & Lüftung', img: 'lueftung', text: 'Split-Klima, Wohnraumlüftung, Wärmerückgewinnung — spürbar besseres Raumklima.' },
+  { slug: 'solar', titel: 'Solar', img: 'solar', text: 'Photovoltaik, Solarthermie, Warmwasser — die Sonne für dich arbeiten lassen.' },
+];
+
+const schritte = [
+  { nr: '01', titel: 'Beratung', text: 'Wir hören zu und zeigen ehrlich, was möglich ist — vor Ort oder am Telefon.' },
+  { nr: '02', titel: 'Planung', text: 'Maßgeschneidert, mit Blick aufs Budget und auf Förderungen, die dir zustehen.' },
+  { nr: '03', titel: 'Umsetzung', text: 'Sauber und termintreu, mit festem Ansprechpartner — bis alles läuft.' },
+];
+
+const fakten = [
+  { zahl: '45+', label: 'Jahre Erfahrung' },
+  { zahl: '3.', label: 'Generation' },
+  { zahl: '~15', label: 'Kolleg:innen' },
+  { zahl: '6', label: 'Gewerke' },
+];
+
+const team = [
+  { name: 'Paul Band', rolle: 'Geschäftsführung' },
+  { name: 'Patrick Band', rolle: 'Geschäftsführung' },
+  { name: 'Dein Meister', rolle: 'Anlagenmechaniker SHK' },
+  { name: 'Nachwuchs', rolle: 'Auszubildende:r' },
+];
+
+const jobs = [
+  { titel: 'Anlagenmechaniker SHK (m/w/d)', typ: 'Vollzeit · Unbefristet' },
+  { titel: 'Servicetechniker / Kundendienst (m/w/d)', typ: 'Vollzeit · Unbefristet' },
+];
+
+const faqs = [
+  { f: 'Was kostet eine Erstberatung?', a: 'Das Erstgespräch ist unverbindlich. Wir schauen uns dein Vorhaben an und sagen ehrlich, was möglich ist.' },
+  { f: 'Kümmert ihr euch um Förderungen (Wärmepumpe, BAFA, KfW)?', a: 'Ja. Wir planen förderfähig und unterstützen bei den Anträgen — damit du das Maximum mitnimmst.' },
+  { f: 'Wie schnell bekomme ich einen Termin?', a: 'In der Regel kurzfristig. Für Notfälle haben wir einen Notdienst — ruf einfach an.' },
+  { f: 'Welche Gebiete deckt ihr ab?', a: 'Ludwigsfelde und Umgebung (Teltow-Fläming). Frag gern nach, ob wir zu dir kommen.' },
+];
+
+const inputCls = "w-full bg-paper border border-ink/15 rounded-lg px-4 py-3.5 text-ink placeholder:text-mute focus:border-john-blue outline-none transition-colors";
 ---
-
-<Layout title="Firma JOHN | Gas · Wasser · Heizung · Sanitär Ludwigsfelde">
-  <!-- Dynamic Background Noise Line or Branding Bar - Re-engineered for freshness -->
-  <div class="w-full bg-[#121315] text-white py-3 px-6 border-b border-[#24262b] text-center flex items-center justify-center space-x-3 text-meta-label">
-    <span class="inline-block h-2 w-2 rounded-full bg-[#ff4c00] animate-pulse"></span>
-    <span class="font-semibold text-white">45 Jahre Meisterqualität</span>
-    <span class="hidden md:inline-block text-[#9a9ba0]">•</span>
-    <span class="hidden md:inline-block text-[#9a9ba0]">Ludwigsfelde & Berlin-Brandenburg</span>
-    <span class="hidden sm:inline-block text-[#ff4c00]/90 font-bold bg-[#ff4c00]/10 px-2.5 py-1 rounded border border-[#ff4c00]/20">Familienbetrieb seit 1981</span>
-  </div>
-
-  <!-- Primary Sticky Header - Ultra Clean Awwwards Aesthetic -->
-  <header class="sticky top-0 z-50 bg-[#fafaf7]/85 backdrop-blur-md border-b border-[#121315]/10">
-    <div class="max-w-7xl mx-auto px-6 sm:px-10 h-24 flex items-center justify-between">
-      
-      <!-- Brand Logo -->
-      <a href="#" class="flex items-baseline space-x-2 text-[#121315] hover:opacity-90">
-        <span class="font-serif text-3xl sm:text-4xl font-black tracking-tight">JOHN</span>
-        <span class="text-meta-label text-[#ff4c00] font-black">Haustechnik</span>
-      </a>
-
-      <!-- Desktop Navigation -->
-      <nav class="hidden md:flex items-center space-x-10">
-        <a href="#services" class="text-[#121315]/70 hover:text-[#121315] text-sm font-semibold tracking-wide transition-colors relative py-2 group">
-          Leistungen
-          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-[#ff4c00] transition-all duration-300 group-hover:w-full"></span>
-        </a>
-        <a href="#team" class="text-[#121315]/70 hover:text-[#121315] text-sm font-semibold tracking-wide transition-colors relative py-2 group">
-          Menschen & Team
-          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-[#ff4c00] transition-all duration-300 group-hover:w-full"></span>
-        </a>
-        <a href="#historie" class="text-[#121315]/70 hover:text-[#121315] text-sm font-semibold tracking-wide transition-colors relative py-2 group">
-          Geschichte
-          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-[#121315] transition-all duration-300 group-hover:w-full"></span>
-        </a>
-        <a href="#karriere" class="text-[#ff4c00] hover:text-[#ff4c00]/80 text-sm font-bold tracking-wide transition-colors flex items-center bg-[#ff4c00]/5 px-3.5 py-1.5 rounded-full border border-[#ff4c00]/10">
-          <span>Karriere</span>
-          <span class="ml-2 px-1.5 py-0.5 bg-[#ff4c00] text-white text-[9px] font-mono rounded-full font-bold uppercase tracking-wider">Jobs</span>
-        </a>
-      </nav>
-
-      <!-- Contact Core CTA (Desktop) -->
-      <div class="hidden md:flex items-center space-x-6">
-        <a 
-          href={`tel:${DEFAULT_ALLGEMEIN.contact_phone.replace(/\s+/g, "")}`} 
-          class="text-[#121315]/80 hover:text-[#121315] text-right transition-colors"
-          data-cms-href="contact_phone"
-        >
-          <span class="block text-[9px] text-[#9a9ba0] uppercase tracking-widest font-bold">Notruf & Büro</span>
-          <span class="font-mono font-bold text-sm text-[#121315]" data-cms="contact_phone">{DEFAULT_ALLGEMEIN.contact_phone}</span>
-        </a>
-        <a 
-          href="#anfrage" 
-          class="inline-flex items-center justify-center px-6 h-12 bg-[#ff4c00] hover:bg-[#ff4c00]/90 text-white font-bold text-xs uppercase tracking-widest rounded-full transition-all duration-300 shadow-sm hover:scale-[1.02] active:scale-[0.98]"
-        >
-          Projekt Planen
-        </a>
-      </div>
-
-      <!-- Mobile Menu Toggle Button -->
-      <button 
-        id="mobile-menu-toggle"
-        type="button" 
-        class="md:hidden flex h-12 w-12 items-center justify-center border border-[#121315]/15 hover:border-[#121315]/30 rounded-full text-[#121315] transition-colors cursor-pointer"
-        aria-label="Menü öffnen"
-      >
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
+<Base>
+  <!-- TOP BAR -->
+  <header class="fixed top-0 inset-x-0 z-50 mix-blend-difference text-white">
+    <div class="flex items-center justify-between px-5 sm:px-8 py-5">
+      <a href="/" class="font-display text-xl tracking-tight leading-none">JOHN</a>
+      <button id="menu-btn" class="hidden sm:flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em]">
+        Menü
+        <span class="flex flex-col gap-[3px]"><span class="block w-4 h-px bg-current"></span><span class="block w-4 h-px bg-current"></span></span>
       </button>
-    </div>
-
-    <!-- Mobile Navigation Drawer -->
-    <div 
-      id="mobile-drawer"
-      class="hidden border-t border-[#121315]/10 overflow-hidden bg-[#fafaf7] shadow-xl absolute top-24 left-0 w-full z-40 transition-all duration-300"
-    >
-      <div class="px-6 py-8 flex flex-col space-y-6">
-        <a 
-          href="#services" 
-          class="text-xl font-bold text-[#121315] hover:text-[#ff4c00]"
-        >
-          Dienstleistungen & Spektrum
-        </a>
-        <a 
-          href="#team" 
-          class="text-xl font-bold text-[#121315] hover:text-[#ff4c00]"
-        >
-          Menschen hinter der Technik
-        </a>
-        <a 
-          href="#historie" 
-          class="text-xl font-bold text-[#121315] hover:text-[#ff4c00]"
-        >
-          Über 45 Jahre Historie
-        </a>
-        <a 
-          href="#karriere" 
-          class="text-xl font-bold text-[#ff4c00] hover:underline flex items-center"
-        >
-          Jobs & Ausbildung @ JOHN
-        </a>
-
-        <div class="pt-6 border-t border-[#121315]/10 space-y-4 font-sans text-left">
-          <div class="text-sm flex items-center space-x-3">
-            <svg class="w-4 h-4 text-[#ff4c00]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
-            <a href={`tel:${DEFAULT_ALLGEMEIN.contact_phone.replace(/\s+/g, "")}`} class="font-bold text-[#121315] font-mono text-base" data-cms-href="contact_phone" data-cms="contact_phone">{DEFAULT_ALLGEMEIN.contact_phone}</a>
-          </div>
-          <div class="text-sm flex items-center space-x-3">
-            <svg class="w-4 h-4 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <span class="font-medium text-[#121315]/80" data-cms="contact_address">{DEFAULT_ALLGEMEIN.contact_address}</span>
-          </div>
-          <a 
-            href="#anfrage" 
-            class="w-full h-12 inline-flex items-center justify-center bg-[#121315] text-white font-bold text-xs uppercase tracking-widest rounded-full"
-          >
-            Kostenfreie Beratung planen
-          </a>
-        </div>
-      </div>
+      <a href="#kontakt" class="text-[11px] font-bold uppercase tracking-[0.2em] border-b border-current pb-0.5">Anfrage</a>
     </div>
   </header>
 
-  <!-- HERO SECTION: Pure Typographic, High-End Architectural Poster -->
-  <section class="relative px-6 sm:px-10 py-20 sm:py-32 md:py-44 max-w-7xl mx-auto w-full overflow-hidden">
-    <!-- Abstract structural grid guidelines representing precision engineering -->
-    <div class="absolute inset-x-0 top-0 h-[120%] pointer-events-none opacity-5 border-x border-[#121315]/10 max-w-7xl mx-auto flex justify-between z-0">
-      <div class="w-[1px] h-full bg-[#121315]"></div>
-      <div class="w-[1px] h-full bg-[#121315] hidden sm:block"></div>
-      <div class="w-[1px] h-full bg-[#121315] hidden md:block"></div>
-      <div class="w-[1px] h-full bg-[#121315]"></div>
+  <!-- HERO -->
+  <section class="relative min-h-svh flex flex-col justify-between overflow-hidden">
+    <!-- Intro line -->
+    <div class="pt-28 sm:pt-32 px-5 sm:px-8 flex justify-end">
+      <p data-reveal class="max-w-sm text-right text-sm sm:text-base font-medium leading-snug text-ink/80">
+        <span class="inline-block w-2 h-2 bg-john-red align-middle mr-2"></span>
+        Mehr als Rohre und Technik. Handwerk von Menschen, die seit&nbsp;1979 dafür einstehen — Bad, Heizung & Solar in Ludwigsfelde.
+      </p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-12 items-start relative z-10">
-      
-      <!-- Typographic Hero Wing -->
-      <div class="lg:col-span-7 flex flex-col justify-center">
-        <div>
-          <div class="flex items-center space-x-3 mb-8">
-            <span class="h-[2px] w-12 bg-[#ff4c00]"></span>
-            <span class="text-meta-label text-[#ff4c00] font-black">
-              Haustechnik mit Unterschrift
-            </span>
-          </div>
-          
-          <!-- Clamp Typography Display Header -->
-          <h1 class="text-display-title font-black text-stone-950 text-left mb-10" data-cms="hero_title">
-            Meisterliche<br />
-            <span class="text-[#ff4c00]">Haustechnik</span> &<br />
-            Bäder.
-          </h1>
-        </div>
+    <!-- Giant wordmark -->
+    <div class="px-3 sm:px-5 -mb-[1.5vw]">
+      <h1 id="wordmark" class="font-display leading-[0.78] tracking-[-0.05em] text-[27vw] select-none">
+        <span class="text-john-blue">JOH</span><span class="text-john-red">N</span>
+      </h1>
+    </div>
 
-        <div class="space-y-8 text-left">
-          <p class="text-[#121315]/80 text-body-editorial max-w-[580px]" data-cms="hero_subtitle">
-            {DEFAULT_ALLGEMEIN.hero_subtitle}
-          </p>
-          
-          <!-- Call to Actions alignment -->
-          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
-            <a 
-              href="#anfrage" 
-              class="inline-flex items-center justify-center px-10 h-14 bg-[#ff4c00] hover:bg-[#ff4c00]/95 text-white font-bold text-xs uppercase tracking-widest rounded-full transition-all duration-300 shadow-sm"
-            >
-              Express-Anfrage senden
-            </a>
-            <a 
-              href="#services" 
-              class="inline-flex items-center justify-center px-8 h-14 bg-white hover:bg-stone-50 text-[#121315] border border-[#121315]/15 font-bold text-xs uppercase tracking-widest rounded-full transition-all duration-300"
-            >
-              Leistungsspektrum
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Real-Time Metrics Wing -->
-      <div class="lg:col-span-5 lg:pl-8">
-        <div class="w-full bg-white border-2 border-[#121315] rounded-3xl p-8 sm:p-10 shadow-[6px_6px_0px_0px_rgba(18,19,21,1)] relative overflow-hidden text-left">
-          
-          <!-- Title Gauge -->
-          <div class="flex items-center justify-between mb-8 border-b border-stone-100 pb-6">
-            <h3 class="font-serif text-xl sm:text-2xl font-bold text-[#121315] tracking-tight">Meister-Messer</h3>
-            <span class="text-[10px] uppercase font-mono tracking-widest text-[#ff4c00] px-2.5 py-0.5 bg-[#ff4c00]/10 rounded-full font-bold">Technik-Ticker</span>
-          </div>
-
-          <div class="space-y-6">
-            <!-- Parameter 1 -->
-            <div>
-              <span class="text-[10px] uppercase font-mono text-stone-400 tracking-wider">Erfahrung</span>
-              <div class="text-3xl font-serif font-black text-[#121315]" data-cms="experience_stat">{DEFAULT_ALLGEMEIN.experience_stat}</div>
-              <p class="text-xs text-stone-500 mt-1">Gegründet 1981 in Ludwigsfelde</p>
-            </div>
-
-            <!-- Div bar -->
-            <div class="h-[1px] bg-stone-150"></div>
-
-            <!-- Parameter 2 -->
-            <div>
-              <span class="text-[10px] uppercase font-mono text-stone-400 tracking-wider">Kundenzufriedenheit</span>
-              <div class="text-3xl font-serif font-black text-[#ff4c00]" data-cms="success_stat">{DEFAULT_ALLGEMEIN.success_stat}</div>
-              <p class="text-xs text-stone-500 mt-1">Echte Meisterleistung mit Gewährleistung</p>
-            </div>
-
-            <!-- Div bar -->
-            <div class="h-[1px] bg-stone-150"></div>
-
-            <!-- Parameter 3 -->
-            <div>
-              <span class="text-[10px] uppercase font-mono text-stone-400 tracking-wider">Analoger Notdienst</span>
-              <div class="text-sm font-bold text-stone-700 font-mono flex items-center gap-2">
-                <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span data-cms="notdienst_phone">{DEFAULT_ALLGEMEIN.notdienst_phone}</span>
-              </div>
-              <p class="text-xs text-stone-500 mt-1">Soforthilfe bei massiven Wasserschäden vor Ort</p>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Corner labels -->
+    <div class="flex items-end justify-between px-5 sm:px-8 pb-5 text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.2em] text-mute">
+      <span>EST. 1979</span>
+      <span class="flex items-center gap-2"><span class="hidden sm:inline">Scrollen</span><span class="block w-px h-6 bg-mute/50 animate-pulse"></span></span>
+      <span>Ludwigsfelde</span>
     </div>
   </section>
 
-  <!-- WORK SPECTRUM: The Full-Width Solid Dark Block offering rich spatial rhythm -->
-  <section id="services" class="bg-[#121315] text-[#fafaf7] py-24 sm:py-36 relative overflow-hidden">
-    <!-- Starburst ambient light effect -->
-    <div class="absolute -right-36 -top-36 h-96 w-96 rounded-full bg-[#ff4c00]/10 blur-[100px] pointer-events-none"></div>
-
-    <div class="max-w-7xl mx-auto px-6 sm:px-10 relative z-10">
-      
-      <div class="mb-20 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <div class="lg:col-span-8">
-          <span class="text-meta-label text-[#ff4c00] font-black block mb-4">
-            Unser Leistungsspektrum
-          </span>
-          <h2 class="text-section-header text-white font-black">
-            Planung, Modernisierung & Handwerkliche Instandhaltung.
-          </h2>
-        </div>
-        <div class="lg:col-span-4 lg:pt-8">
-          {/* Strict reading limit container */}
-          <p class="text-stone-400 text-body-editorial max-w-[580px]">
-            Ob Komplettbäder fürs Alter, zukunftssichere Wärmepumpen oder regelmäßige Gas-Sicherheitschecks. Nutzen Sie die Kategorien unten, um nähere Details und den zuständigen Meister zu erfahren.
-          </p>
-        </div>
-      </div>
-
-      <!-- Grid of Services Categories -->
-      <div id="services-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {SERVICE_CATEGORIES.map((category) => (
-          <div class="bg-[#1c1d21] border border-stone-800 rounded-3xl p-8 hover:border-[#ff4c00]/40 transition-luxury flex flex-col justify-between min-h-[380px] group text-left">
-            <div>
-              <div class="w-12 h-12 rounded-full bg-[#ff4c00]/10 flex items-center justify-center text-[#ff4c00] mb-8 group-hover:scale-110 transition-transform duration-300">
-                {category.id === "sanitaer" && (
-                  <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                  </svg>
-                )}
-                {category.id === "heizung" && (
-                  <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048" />
-                  </svg>
-                )}
-                {category.id === "lueftung" && (
-                  <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1" />
-                  </svg>
-                )}
-                {category.id === "solar" && (
-                  <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1" />
-                  </svg>
-                )}
-              </div>
-              <h3 class="text-xl font-bold mb-4">{category.title}</h3>
-              <p class="text-stone-400 text-sm leading-relaxed mb-6">{category.description}</p>
-            </div>
-            <div>
-              <ul class="space-y-2 mb-6 border-t border-stone-800 pt-4">
-                {category.details[0].bullets.slice(0, 3).map((bullet) => (
-                  <li class="text-xs text-stone-500 flex items-start gap-2">
-                    <span class="text-[#ff4c00] mt-0.5">•</span>
-                    <span>{bullet}</span>
-                  </li>
-                ))}
-              </ul>
-              <a href="#anfrage" class="inline-flex items-center text-xs font-mono font-bold text-[#ff4c00] tracking-wider uppercase group-hover:translate-x-1 transition-transform">
-                Anfragen &nbsp;→
-              </a>
-            </div>
-          </div>
-        ))}
-      </div>
+  <!-- FULL-SCREEN IMAGE -->
+  <section class="relative min-h-svh w-full overflow-hidden bg-ink">
+    <img src="/img/hero.jpg" alt="Handschlag zweier Handwerker" class="absolute inset-0 w-full h-full object-cover will-change-transform" id="hero-img" />
+    <div class="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-transparent"></div>
+    <div class="relative z-10 min-h-svh flex flex-col justify-end px-5 sm:px-8 pb-16 sm:pb-24 text-white">
+      <p data-reveal class="text-[11px] font-bold uppercase tracking-[0.3em] text-john-red mb-4">Anpacken statt versprechen</p>
+      <h2 data-reveal class="font-display text-[9vw] sm:text-[6vw] leading-[0.92] max-w-5xl">
+        Handwerk von Menschen,<br/>die dafür einstehen.
+      </h2>
     </div>
   </section>
 
-  <!-- TEAM SECTION: Human Authenticity & Portrait Cards -->
-  <section id="team" class="py-24 sm:py-36 bg-[#fafaf7] relative overflow-hidden text-left">
-    <div class="max-w-7xl mx-auto px-6 sm:px-10">
-      
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start mb-20">
-        <div class="lg:col-span-6">
-          <span class="text-meta-label text-[#ff4c00] font-black block mb-4">
-            Familienschlagkraft
-          </span>
-          <h2 class="text-section-header text-[#121315] font-black mb-6">
-            Menschen, die Ihr Vertrauen verdienen.
-          </h2>
-          <div class="h-2 w-20 bg-[#ff4c00]"></div>
+  <!-- LEISTUNGEN -->
+  <section id="leistungen" class="px-5 sm:px-8 py-24 sm:py-36">
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-14 sm:mb-20">
+        <div data-reveal>
+          <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-john-red mb-4">Unser Handwerk</p>
+          <h2 class="font-display text-[12vw] sm:text-[5.5vw] leading-[0.9]">Sechs Gewerke.<br/>Eine&nbsp;Hand.</h2>
         </div>
-
-        <div class="lg:col-span-6 text-stone-600 lg:pt-10">
-          <p class="text-body-editorial max-w-[580px]">
-            In einer Zeit des unpersönlichen Internet-Auftritts setzen wir bewusst ein Zeichen. Wir schicken keine wechselnden Subunternehmer, sondern verlässliche Gesichter mit Brief und Siegel. Lernen Sie die Menschen kennen, die täglich bei Ihnen vor Ort sind.
-          </p>
-        </div>
-      </div>
-
-      <div id="team-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-        {TEAM_MEMBERS.map((member) => (
-          <div class="bg-white border border-stone-200 rounded-3xl overflow-hidden hover:shadow-md transition-luxury flex flex-col justify-between">
-            <div class="relative aspect-square overflow-hidden bg-stone-100">
-              <img 
-                class="w-full h-full object-cover object-center grayscale hover:grayscale-0 transition-all duration-700" 
-                src={member.imageUrl} 
-                alt={member.name} 
-              />
-              <div class="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm p-4 rounded-xl border border-stone-100 shadow-sm">
-                <span class="text-[9px] font-mono uppercase tracking-widest text-stone-400">Seit {member.experienceYear} im Team</span>
-                <h4 class="text-lg font-bold text-stone-1000 mt-1">{member.name}</h4>
-                <p class="text-xs text-[#ff4c00] font-semibold mt-0.5">{member.role}</p>
-              </div>
-            </div>
-            <div class="p-8 flex flex-col justify-between flex-grow">
-              <blockquote class="text-stone-600 italic text-sm mb-6 relative">
-                "{member.quote}"
-              </blockquote>
-              <p class="text-xs text-stone-500 leading-relaxed font-sans border-t border-stone-100 pt-4">
-                {member.description}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- CHRONICLE TIMELINE: Bold Vintage Graphic -->
-  <section id="historie" class="bg-[#121315] text-[#fafaf7] py-24 sm:py-36 relative overflow-hidden text-left">
-    <div class="max-w-7xl mx-auto px-6 sm:px-10 relative z-10">
-      
-      <div class="mb-24 text-center">
-        <span class="text-meta-label text-[#ff4c00] font-black block mb-4">
-          Präzision in Generationen
-        </span>
-        <h2 class="text-section-header font-black text-white mb-6">
-          Unsere Historie als Zollstock-Chronik
-        </h2>
-        <p class="text-stone-400 text-body-editorial max-w-[580px] mx-auto">
-          Seit 1981 messen wir Millimeter für Millimeter höchste Kundenzufriedenheit. Unser "Zollstock"-Maßband zeigt die wichtigsten Meilensteine.
+        <p data-reveal class="max-w-xs text-mute text-sm sm:text-base leading-relaxed sm:text-right">
+          Von Bad bis Solar — alles aus einem Haus, von Menschen, die ihr Fach lieben.
         </p>
       </div>
 
-      <!-- Main vertical line -->
-      <div id="history-container" class="relative border-l border-stone-800 max-w-3xl mx-auto pl-8 sm:pl-12 space-y-16">
-        {HISTORY_MILESTONES.map((milestone) => (
-          <div class="relative group">
-            <div class="absolute -left-[45px] sm:-left-[61px] top-1.5 w-6 h-6 rounded-full bg-[#121315] border-2 border-[#ff4c00] flex items-center justify-center group-hover:bg-[#ff4c00] transition-colors duration-300">
-              <div class="w-2 h-2 rounded-full bg-[#ff4c00] group-hover:bg-white transition-colors duration-300"></div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+        {leistungen.map((l) => (
+          <a href={`/leistungen/${l.slug}`} class="group block" data-reveal>
+            <div class="overflow-hidden rounded-xl aspect-[4/3] mb-5 bg-ink/5">
+              <img src={`/img/${l.img}.jpg`} alt={l.titel} loading="lazy"
+                   class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]" />
             </div>
-            <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6 mb-2">
-              <span class="text-3xl font-serif font-black text-[#ff4c00] leading-none">{milestone.year}</span>
-              <h4 class="text-xl font-bold text-white">{milestone.title}</h4>
+            <div class="flex items-baseline justify-between gap-3">
+              <h3 class="font-display text-2xl sm:text-[1.7rem] leading-none">{l.titel}</h3>
+              <span class="text-john-red text-lg transition-transform duration-300 group-hover:translate-x-1.5">→</span>
             </div>
-            <p class="text-stone-400 text-sm leading-relaxed max-w-2xl">{milestone.description}</p>
+            <p class="text-mute text-sm mt-2 leading-snug">{l.text}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- SO ARBEITEN WIR -->
+  <section id="ablauf" class="px-5 sm:px-8 py-24 sm:py-36 border-t border-ink/10">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-14 sm:mb-20 max-w-3xl" data-reveal>
+        <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-john-red mb-4">So arbeiten wir</p>
+        <h2 class="font-display text-[11vw] sm:text-[5vw] leading-[0.92]">Von der Idee bis zur<br/>letzten&nbsp;Schraube.</h2>
+        <p class="mt-6 text-mute max-w-xl leading-relaxed">Ein Ansprechpartner begleitet dich vom ersten Gespräch bis zur Abnahme — alles aus einer Hand.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8">
+        {schritte.map((s) => (
+          <div class="border-t-2 border-john-blue pt-5" data-reveal>
+            <span class="font-display text-john-blue text-5xl block mb-3 leading-none">{s.nr}</span>
+            <h3 class="font-display text-2xl mb-2">{s.titel}</h3>
+            <p class="text-mute text-sm leading-relaxed">{s.text}</p>
           </div>
         ))}
       </div>
     </div>
   </section>
 
-  <!-- CAREER SECTION: High-Contrast Grid Elements for Recruitment -->
-  <section id="karriere" class="py-24 sm:py-36 bg-[#fafaf7] relative overflow-hidden text-left">
-    <div class="max-w-7xl mx-auto px-6 sm:px-10">
-      
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start mb-20">
-        <div class="lg:col-span-6">
-          <span class="text-meta-label text-[#ff4c00] font-black block mb-4">
-            Wachsen Sie mit uns!
-          </span>
-          <h2 class="text-section-header text-[#121315] font-black mb-6">
-            Komm in's Team! <br />
-            Alles im Griff.
-          </h2>
-        </div>
-
-        <div class="lg:col-span-6 text-stone-600 lg:pt-10">
-          <p class="text-body-editorial max-w-[580px] mb-6">
-            Wir haken keine To-Do-Listen ab. Wir arbeiten verlässlich, familiär und auf Augenhöhe. Sie haben die Ausbildung, wir bieten den langfristig sicheren Heimathafen direkt in Ludwigsfelde – <strong>garantiert ohne Montagen oder unfaire Schichtdienste</strong>.
-          </p>
-          <p class="text-sm text-stone-400 font-mono italic">
-            → Auch Ausbildungsbewerbungen sind jederzeit willkommen!
-          </p>
+  <!-- WARUM JOHN (dunkel) -->
+  <section id="warum" class="px-5 sm:px-8 py-24 sm:py-36 bg-ink text-white">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+      <div data-reveal>
+        <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-john-red mb-4">Warum JOHN</p>
+        <h2 class="font-display text-[11vw] sm:text-[4.6vw] leading-[0.95] mb-6">Seit 1979<br/>Familiensache.</h2>
+        <p class="text-white/70 max-w-lg leading-relaxed">
+          Gegründet 1979 von Bodo John, heute in dritter Generation von Paul & Patrick Band geführt — als Innungsbetrieb mit festen Partnern wie Bosch und Viessmann. Handwerk, das man sich die Hand drauf gibt.
+        </p>
+        <div class="flex flex-wrap gap-x-6 gap-y-2 mt-8 text-xs text-white/50 font-mono uppercase tracking-[0.15em]">
+          <span>Innungsbetrieb</span><span>·&nbsp;&nbsp;Bosch</span><span>·&nbsp;&nbsp;Viessmann</span>
         </div>
       </div>
-
-      <!-- Job List Cards -->
-      <div id="jobs-container" class="space-y-12">
-        {JOB_VACANCIES.map((job) => (
-          <div class="bg-white border border-stone-200 rounded-3xl p-8 sm:p-12 hover:shadow-md transition-luxury">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-stone-100 pb-8 mb-8">
-              <div>
-                <span class="inline-block px-3 py-1 bg-stone-100 text-stone-600 text-[10px] font-mono uppercase tracking-wider rounded-full mb-3">
-                  {job.type}
-                </span>
-                <h3 class="text-2xl font-bold text-stone-900">{job.title}</h3>
-              </div>
-              <a 
-                href={`mailto:info@john-haustechnik.de?subject=Bewerbung%20als%20${encodeURIComponent(job.title)}`}
-                class="inline-flex items-center justify-center px-6 h-12 bg-[#ff4c00] hover:bg-[#ff4c00]/90 text-white font-bold text-xs uppercase tracking-widest rounded-full transition-all duration-300"
-              >
-                Jetzt formlos bewerben
-              </a>
-            </div>
-
-            <p class="text-stone-600 text-sm mb-8 leading-relaxed max-w-3xl">
-              {job.intro}
-            </p>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              <div>
-                <h4 class="text-xs font-mono uppercase tracking-wider text-stone-400 mb-4 font-bold">Was Sie mitbringen:</h4>
-                <ul class="space-y-3">
-                  {job.requirements.map((req) => (
-                    <li class="text-sm text-stone-700 flex items-start gap-3">
-                      <svg class="w-5 h-5 text-stone-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>{req}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 class="text-xs font-mono uppercase tracking-wider text-[#ff4c00] mb-4 font-bold">Was wir bieten:</h4>
-                <ul class="space-y-3">
-                  {job.benefits.map((benefit) => (
-                    <li class="text-sm text-stone-700 flex items-start gap-3">
-                      <svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
-                      <span>{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+      <div class="grid grid-cols-2 gap-px bg-white/10 rounded-xl overflow-hidden" data-reveal>
+        {fakten.map((f) => (
+          <div class="bg-ink p-8 sm:p-10">
+            <span class="font-display text-5xl sm:text-6xl block leading-none">{f.zahl}</span>
+            <span class="text-white/45 text-sm mt-3 block">{f.label}</span>
           </div>
         ))}
       </div>
     </div>
   </section>
 
-  <!-- SIMPLE & OPTIMIZED DIRECT INQUIRY FORM -->
-  <section id="anfrage" class="bg-[#fafaf7] pb-24 sm:pb-36 relative overflow-hidden text-left">
-    <div class="max-w-4xl mx-auto px-6">
-      <div class="bg-white border-2 border-[#121315] rounded-3xl p-8 sm:p-12 shadow-[6px_6px_0px_0px_rgba(18,19,21,1)]">
-        <div class="text-center mb-12">
-          <span class="text-meta-label text-[#ff4c00] font-black block mb-4">Direktanfrage</span>
-          <h2 class="text-section-header text-[#121315] font-black mb-4">Projektanfrage starten</h2>
-          <p class="text-stone-500 text-sm max-w-[500px] mx-auto leading-relaxed">
-            Sende uns unverbindlich Deine Wünsche. Unser Büro meldet sich innerhalb von 24 Stunden bei Dir.
-          </p>
+  <!-- TEAM -->
+  <section id="team" class="px-5 sm:px-8 py-24 sm:py-36 border-t border-ink/10">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid lg:grid-cols-2 gap-8 lg:items-end mb-12 sm:mb-16">
+        <div data-reveal>
+          <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-john-red mb-4">Menschen hinter dem Service</p>
+          <h2 class="font-display text-[11vw] sm:text-[5vw] leading-[0.92]">Echte Gesichter,<br/>kein&nbsp;Callcenter.</h2>
         </div>
-
-        <form id="direct-inquiry-form" class="space-y-6">
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <label class="cursor-pointer border-2 border-stone-200 rounded-2xl p-4 text-center hover:border-[#ff4c00] transition-colors relative flex flex-col items-center gap-2">
-              <input type="radio" name="project_type" value="sanitaer" class="absolute top-4 right-4 accent-[#ff4c00]" checked />
-              <svg class="w-6 h-6 text-[#ff4c00]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-              </svg>
-              <span class="text-sm font-bold text-stone-900 mt-1">Bad / Sanitär</span>
-            </label>
-            <label class="cursor-pointer border-2 border-stone-200 rounded-2xl p-4 text-center hover:border-[#ff4c00] transition-colors relative flex flex-col items-center gap-2">
-              <input type="radio" name="project_type" value="heizung" class="absolute top-4 right-4 accent-[#ff4c00]" />
-              <svg class="w-6 h-6 text-[#ff4c00]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048" />
-              </svg>
-              <span class="text-sm font-bold text-stone-900 mt-1">Wärme / Heizung</span>
-            </label>
-            <label class="cursor-pointer border-2 border-stone-200 rounded-2xl p-4 text-center hover:border-[#ff4c00] transition-colors relative flex flex-col items-center gap-2">
-              <input type="radio" name="project_type" value="klima" class="absolute top-4 right-4 accent-[#ff4c00]" />
-              <svg class="w-6 h-6 text-[#ff4c00]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1" />
-              </svg>
-              <span class="text-sm font-bold text-stone-900 mt-1">Solar / Lüftung</span>
-            </label>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-xs font-mono uppercase tracking-wider text-stone-400 mb-2 font-bold">Dein Name *</label>
-              <input type="text" required placeholder="Sven Muster" class="w-full h-12 px-4 rounded-xl border border-stone-200 focus:border-[#ff4c00] focus:outline-none transition-colors" />
+        <p data-reveal class="text-mute max-w-md leading-relaxed lg:text-right lg:justify-self-end">
+          Vom Meister bis zum Azubi — bei JOHN weißt du, wer bei dir vor Ort steht.
+        </p>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+        {team.map((m) => (
+          <div data-reveal>
+            <div class="aspect-[3/4] rounded-xl bg-gradient-to-b from-ink/10 to-ink/5 mb-4 flex items-end justify-center relative overflow-hidden">
+              <span class="font-mono text-[10px] uppercase tracking-widest text-mute/60 mb-4">Foto folgt</span>
             </div>
+            <h3 class="font-display text-lg sm:text-xl leading-tight">{m.name}</h3>
+            <p class="text-mute text-xs sm:text-sm mt-0.5">{m.rolle}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- KARRIERE (blau) -->
+  <section id="karriere" class="px-5 sm:px-8 py-24 sm:py-36 bg-john-blue text-white">
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-20">
+      <div data-reveal>
+        <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-white/70 mb-4">Karriere bei JOHN</p>
+        <h2 class="font-display text-[13vw] sm:text-[5.5vw] leading-[0.88] mb-6">Komm ins<br/>Team.</h2>
+        <p class="text-white/80 max-w-md leading-relaxed">Modern, jung und kompetent — ohne Baustellenhektik. Bei uns lernst du, wächst du, und bist abends zu Hause: keine Fernmontage, nur regionale Einsätze.</p>
+        <p class="mt-6 inline-flex items-center gap-2 text-sm font-bold"><span class="w-2 h-2 bg-john-red inline-block"></span> Bewerbung ohne Anschreiben.</p>
+      </div>
+      <div class="space-y-4" data-reveal>
+        {jobs.map((j) => (
+          <a href="/karriere" class="group flex items-center justify-between gap-4 bg-white/10 hover:bg-white/[0.16] transition-colors rounded-xl p-6">
             <div>
-              <label class="block text-xs font-mono uppercase tracking-wider text-stone-400 mb-2 font-bold">Telefonnummer *</label>
-              <input type="tel" required placeholder="0172 / 1234567" class="w-full h-12 px-4 rounded-xl border border-stone-200 focus:border-[#ff4c00] focus:outline-none transition-colors" />
+              <h3 class="font-display text-lg sm:text-xl leading-tight">{j.titel}</h3>
+              <p class="text-white/60 text-sm mt-1">{j.typ}</p>
             </div>
-          </div>
+            <span class="text-john-red text-xl shrink-0 transition-transform group-hover:translate-x-1.5">→</span>
+          </a>
+        ))}
+        <a href="/karriere" class="inline-flex items-center gap-2 mt-2 text-sm font-bold uppercase tracking-[0.15em] border-b border-white/40 pb-1">Alle Stellen ansehen →</a>
+      </div>
+    </div>
+  </section>
 
-          <div>
-            <label class="block text-xs font-mono uppercase tracking-wider text-stone-400 mb-2 font-bold">E-Mail-Adresse *</label>
-            <input type="email" required placeholder="sven@beispiel.de" class="w-full h-12 px-4 rounded-xl border border-stone-200 focus:border-[#ff4c00] focus:outline-none transition-colors" />
+  <!-- KONTAKT + MAP -->
+  <section id="kontakt" class="px-5 sm:px-8 py-24 sm:py-36 border-t border-ink/10">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-12 sm:mb-16 max-w-2xl" data-reveal>
+        <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-john-red mb-4">Kontakt</p>
+        <h2 class="font-display text-[12vw] sm:text-[5.5vw] leading-[0.9]">Sprich mit einem<br/>echten&nbsp;Menschen.</h2>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-10 lg:gap-16">
+        <form class="space-y-5" data-reveal onsubmit="return false">
+          <div class="grid sm:grid-cols-2 gap-5">
+            <input type="text" placeholder="Name" class={inputCls} />
+            <input type="tel" placeholder="Telefon" class={inputCls} />
           </div>
-
-          <div>
-            <label class="block text-xs font-mono uppercase tracking-wider text-stone-400 mb-2 font-bold">Dein Anliegen / Projektbeschreibung</label>
-            <textarea rows="4" placeholder="Beschreibe kurz Dein Vorhaben. Z.B. Heizungstausch, altersgerechter Badumbau, Notfall oder Wartung..." class="w-full p-4 rounded-xl border border-stone-200 focus:border-[#ff4c00] focus:outline-none transition-colors resize-none"></textarea>
-          </div>
-
-          <button id="inquiry-submit-btn" type="submit" class="w-full h-14 bg-[#ff4c00] hover:bg-[#ff4c00]/90 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all duration-300 pointer-events-auto cursor-pointer">
-            Anfrage absenden
-          </button>
+          <select class={inputCls}>
+            <option>Anliegen wählen…</option>
+            <option>Bad / Sanitär</option><option>Heizung / Wärmepumpe</option>
+            <option>Klima &amp; Lüftung</option><option>Solar</option>
+            <option>Notdienst</option><option>Sonstiges</option>
+          </select>
+          <textarea rows="4" placeholder="Worum geht's?" class={inputCls}></textarea>
+          <button type="submit" class="inline-flex items-center gap-2 bg-john-blue hover:bg-john-blue-deep transition-colors text-white font-bold rounded-lg px-7 py-3.5">Anfrage senden →</button>
         </form>
-        <div id="success-message" class="hidden mt-6 p-6 bg-emerald-50 border border-emerald-200 rounded-xl text-center text-emerald-800 text-sm font-medium">
-          Vielen Dank! Deine Projektanfrage wurde erfolgreich übermittelt. Wir melden uns umgehend bei Dir.
+        <div data-reveal>
+          <div class="space-y-1 mb-6">
+            <p class="font-display text-2xl mb-2">Firma JOHN</p>
+            <p class="text-mute">Dornweg 14 · 14974 Ludwigsfelde</p>
+            <p><a href="tel:0337851210" class="text-john-blue font-bold hover:underline">03378 51 12 10</a></p>
+            <p class="text-mute">info@firma-john.de</p>
+          </div>
+          <div class="aspect-[16/10] rounded-xl bg-ink/5 border border-ink/10 flex items-center justify-center">
+            <span class="font-mono text-[11px] uppercase tracking-widest text-mute text-center px-4">Karte · Ludwigsfelde<br/>(DSGVO: Klick zum Laden)</span>
+          </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="px-5 sm:px-8 py-24 sm:py-36 border-t border-ink/10">
+    <div class="max-w-3xl mx-auto">
+      <div class="mb-12" data-reveal>
+        <p class="text-[11px] font-bold uppercase tracking-[0.3em] text-john-red mb-4">Häufige Fragen</p>
+        <h2 class="font-display text-[13vw] sm:text-[5vw] leading-[0.9]">Gut zu wissen.</h2>
+      </div>
+      <div class="border-t border-ink/10" data-reveal>
+        {faqs.map((q) => (
+          <details class="group border-b border-ink/10 py-5">
+            <summary class="flex items-center justify-between gap-4 cursor-pointer list-none font-display text-lg sm:text-xl">
+              {q.f}
+              <span class="text-john-red text-2xl shrink-0 transition-transform duration-300 group-open:rotate-45">+</span>
+            </summary>
+            <p class="text-mute mt-3 leading-relaxed">{q.a}</p>
+          </details>
+        ))}
+      </div>
+      <a href="/faq" class="inline-flex items-center gap-2 mt-8 text-sm font-bold uppercase tracking-[0.15em] text-john-blue border-b border-john-blue/30 pb-1">Alle Fragen →</a>
     </div>
   </section>
 
   <!-- FOOTER -->
-  <footer class="bg-[#121315] text-[#9a9ba0] pt-24 pb-12 border-t border-[#24262b] text-left">
-    <div class="max-w-7xl mx-auto px-6 sm:px-10">
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-16 mb-16">
-        <div class="md:col-span-4">
-          <a href="#" class="flex items-baseline space-x-2 text-white hover:opacity-90 transition-opacity mb-6">
-            <span class="font-serif text-3xl font-black tracking-tight">JOHN</span>
-            <span class="text-meta-label text-[#ff4c00] font-black">Haustechnik</span>
-          </a>
-          <p class="text-xs text-stone-500 leading-relaxed max-w-[280px]">
-            Firma Sven John e.K. — Ihr traditionsbewusster Meisterbetrieb für Gas, Wasser, Heizung, Sanitär, Lüftung & Solar in Brandenburg.
-          </p>
+  <footer class="bg-ink text-white px-5 sm:px-8 pt-20 pb-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid md:grid-cols-3 gap-10 mb-16">
+        <div>
+          <p class="font-display text-3xl mb-4 leading-none"><span class="text-john-blue">JOH</span><span class="text-john-red">N</span></p>
+          <p class="text-white/45 text-sm max-w-xs leading-relaxed">Meisterbetrieb für Sanitär, Heizung, Klima & Solar in Ludwigsfelde. Seit 1979, in dritter Generation.</p>
         </div>
-
-        <div class="md:col-span-4">
-          <h4 class="text-xs font-mono uppercase tracking-wider text-white font-bold mb-6">Kontakt & Service</h4>
-          <ul class="space-y-3 text-xs">
-            <li data-cms="contact_address">Dornweg 14, 14974 Ludwigsfelde</li>
-            <li>Notruf & Büro: <a href="tel:03378801127" class="text-white hover:underline font-mono" data-cms-href="contact_phone" data-cms="contact_phone">{DEFAULT_ALLGEMEIN.contact_phone}</a></li>
-            <li>E-Mail: <a href="mailto:info@john-haustechnik.de" class="text-white hover:underline" data-cms-href="contact_email" data-cms="contact_email">{DEFAULT_ALLGEMEIN.contact_email}</a></li>
-            <li class="pt-2 text-[10px] text-stone-500 font-mono" data-cms="contact_hours">{DEFAULT_ALLGEMEIN.contact_hours}</li>
-          </ul>
+        <div class="text-sm text-white/60 space-y-1.5">
+          <p class="text-white/35 uppercase text-[10px] tracking-[0.2em] mb-3">Kontakt</p>
+          <p>Dornweg 14, 14974 Ludwigsfelde</p>
+          <p><a href="tel:0337851210" class="hover:text-white transition-colors">03378 51 12 10</a></p>
+          <p>info@firma-john.de</p>
         </div>
-
-        <div class="md:col-span-4">
-          <h4 class="text-xs font-mono uppercase tracking-wider text-white font-bold mb-6">Rechtliches</h4>
-          <ul class="space-y-3 text-xs">
-            <li><a href="#impressum" class="hover:text-white">Impressum</a></li>
-            <li><a href="#datenschutz" class="hover:text-white">Datenschutzerklärung</a></li>
-            <li><a href="#cookie-settings" class="hover:text-white">Cookie-Einstellungen</a></li>
-            <li class="pt-4 text-[10px] text-[#ff4c00] font-bold">Eingetragen in der Handwerkskammer Potsdam</li>
-          </ul>
+        <div class="text-sm text-white/60 space-y-1.5">
+          <p class="text-white/35 uppercase text-[10px] tracking-[0.2em] mb-3">Seite</p>
+          <a class="block hover:text-white transition-colors" href="#leistungen">Leistungen</a>
+          <a class="block hover:text-white transition-colors" href="#warum">Unternehmen</a>
+          <a class="block hover:text-white transition-colors" href="#karriere">Karriere</a>
+          <a class="block hover:text-white transition-colors" href="#kontakt">Kontakt</a>
         </div>
       </div>
-
-      <div class="border-t border-stone-800 pt-8 flex flex-col sm:flex-row justify-between items-center text-[10px] uppercase font-mono tracking-wider text-stone-600 gap-4">
-        <span>© 2026 Firma Sven John e.K. Alle Rechte vorbehalten.</span>
-        <span>Meister seit 1981</span>
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-6 border-t border-white/10 text-xs text-white/40">
+        <span>© 2026 p&p hauswerk GmbH · Innungsbetrieb SHK</span>
+        <div class="flex gap-6"><a href="/impressum" class="hover:text-white transition-colors">Impressum</a><a href="/datenschutz" class="hover:text-white transition-colors">Datenschutz</a></div>
       </div>
     </div>
   </footer>
 
-  <!-- Native, High-Performance Interactive Functions -->
   <script>
-    // Safe vanilla mobile-menu drawer toggle
-    const toggleBtn = document.getElementById('mobile-menu-toggle');
-    const drawer = document.getElementById('mobile-drawer');
-    if (toggleBtn && drawer) {
-      toggleBtn.addEventListener('click', () => {
-        drawer.classList.toggle('hidden');
-      });
-    }
+    import Lenis from 'lenis';
+    import { animate } from 'motion';
 
-    // Inquiry submission handler
-    const inquiryForm = document.getElementById('direct-inquiry-form');
-    const successMsg = document.getElementById('success-message');
-    if (inquiryForm && successMsg) {
-      inquiryForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        successMsg.classList.remove('hidden');
-        inquiryForm.classList.add('hidden');
-        successMsg.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      });
-    }
+    // Smooth scroll
+    const lenis = new Lenis({ duration: 1.1, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+    function raf(time: number) { lenis.raf(time); requestAnimationFrame(raf); }
+    requestAnimationFrame(raf);
 
-    // Dynamic Client-Side CMS Injection from local cache
-    const cmsCacheStr = localStorage.getItem("john_haustechnik_cms_public_cache");
-    if (cmsCacheStr) {
-      try {
-        const data = JSON.parse(cmsCacheStr);
-        
-        // 1. Process Allgemeines text content
-        const cms = data.allgemeines;
-        if (cms) {
-          Object.keys(cms).forEach(key => {
-            const val = cms[key];
-            if (!val) return;
-            
-            // Text nodes
-            document.querySelectorAll(`[data-cms="${key}"]`).forEach(el => {
-              el.textContent = val;
-            });
-            
-            // Link hrefs
-            if (key === 'contact_phone') {
-              document.querySelectorAll('[data-cms-href="contact_phone"]').forEach(el => {
-                el.setAttribute('href', `tel:${val.trim().replace(/\s+/g, "")}`);
-              });
-            } else if (key === 'contact_email') {
-              document.querySelectorAll('[data-cms-href="contact_email"]').forEach(el => {
-                el.setAttribute('href', `mailto:${val.trim()}`);
-              });
-            }
-          });
+    // Reveal-on-scroll (IntersectionObserver = robust)
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          animate(e.target, { opacity: [0, 1], y: [28, 0] }, { duration: 0.8, ease: [0.16, 1, 0.3, 1] });
+          io.unobserve(e.target);
         }
-        
-        // 2. Re-render Service Categories
-        const servicesContainer = document.getElementById('services-container');
-        if (servicesContainer && data.dienstleistungen && Array.isArray(data.dienstleistungen)) {
-          servicesContainer.innerHTML = data.dienstleistungen.map((cat: any) => {
-            const bulletsHtml = cat.details && cat.details[0] && cat.details[0].bullets
-              ? cat.details[0].bullets.slice(0, 3).map((b: any) => `
-                  <li class="text-xs text-stone-500 flex items-start gap-2">
-                    <span class="text-[#ff4c00] mt-0.5">•</span>
-                    <span>${b}</span>
-                  </li>
-                `).join('')
-              : '';
-            
-            let iconSvg = '';
-            if (cat.id === 'sanitaer') {
-              iconSvg = '<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>';
-            } else if (cat.id === 'heizung') {
-              iconSvg = '<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048" /></svg>';
-            } else {
-              iconSvg = '<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1" /></svg>';
-            }
-
-            return `
-              <div class="bg-[#1c1d21] border border-stone-800 rounded-3xl p-8 hover:border-[#ff4c00]/40 transition-luxury flex flex-col justify-between min-h-[380px] group text-left">
-                <div>
-                  <div class="w-12 h-12 rounded-full bg-[#ff4c00]/10 flex items-center justify-center text-[#ff4c00] mb-8 group-hover:scale-110 transition-transform duration-300">
-                    ${iconSvg}
-                  </div>
-                  <h3 class="text-xl font-bold mb-4">${cat.title}</h3>
-                  <p class="text-stone-400 text-sm leading-relaxed mb-6">${cat.description}</p>
-                </div>
-                <div>
-                  <ul class="space-y-2 mb-6 border-t border-stone-800 pt-4">
-                    ${bulletsHtml}
-                  </ul>
-                  <a href="#anfrage" class="inline-flex items-center text-xs font-mono font-bold text-[#ff4c00] tracking-wider uppercase group-hover:translate-x-1 transition-transform">
-                    Anfragen &nbsp;→
-                  </a>
-                </div>
-              </div>
-            `;
-          }).join('');
-        }
-        
-        // 3. Re-render Team Members
-        const teamContainer = document.getElementById('team-container');
-        if (teamContainer && data.team && Array.isArray(data.team)) {
-          teamContainer.innerHTML = data.team.map((member: any) => `
-            <div class="bg-white border border-stone-200 rounded-3xl overflow-hidden hover:shadow-md transition-luxury flex flex-col justify-between">
-              <div class="relative aspect-square overflow-hidden bg-stone-100">
-                <img 
-                  class="w-full h-full object-cover object-center grayscale hover:grayscale-0 transition-all duration-700" 
-                  src="${member.imageUrl || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=600'}" 
-                  alt="${member.name}" 
-                />
-                <div class="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur-sm p-4 rounded-xl border border-stone-100 shadow-sm">
-                  <span class="text-[9px] font-mono uppercase tracking-widest text-stone-400">Seit ${member.experienceYear} im Team</span>
-                  <h4 class="text-lg font-bold text-stone-1000 mt-1">${member.name}</h4>
-                  <p class="text-xs text-[#ff4c00] font-semibold mt-0.5">${member.role}</p>
-                </div>
-              </div>
-              <div class="p-8 flex flex-col justify-between flex-grow">
-                <blockquote class="text-stone-600 italic text-sm mb-6 relative">
-                  "${member.quote}"
-                </blockquote>
-                <p class="text-xs text-stone-500 leading-relaxed font-sans border-t border-stone-100 pt-4">
-                  ${member.description}
-                </p>
-              </div>
-            </div>
-          `).join('');
-        }
-        
-        // 4. Re-render History Chronologie
-        const historyContainer = document.getElementById('history-container');
-        if (historyContainer && data.historie && Array.isArray(data.historie)) {
-          historyContainer.innerHTML = data.historie.map((milestone: any) => `
-            <div class="relative group">
-              <div class="absolute -left-[45px] sm:-left-[61px] top-1.5 w-6 h-6 rounded-full bg-[#121315] border-2 border-[#ff4c00] flex items-center justify-center group-hover:bg-[#ff4c00] transition-colors duration-300">
-                <div class="w-2 h-2 rounded-full bg-[#ff4c00] group-hover:bg-white transition-colors duration-300"></div>
-              </div>
-              <div class="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6 mb-2">
-                <span class="text-3xl font-serif font-black text-[#ff4c00] leading-none">${milestone.year}</span>
-                <h4 class="text-xl font-bold text-white">${milestone.title}</h4>
-              </div>
-              <p class="text-stone-400 text-sm leading-relaxed max-w-2xl">${milestone.description}</p>
-            </div>
-          `).join('');
-        }
-        
-        // 5. Re-render jobs list
-        const jobsContainer = document.getElementById('jobs-container');
-        if (jobsContainer && data.jobs && Array.isArray(data.jobs)) {
-          jobsContainer.innerHTML = data.jobs.map((job: any) => {
-            const reqs = Array.isArray(job.requirements) ? job.requirements : [];
-            const requirementsHtml = reqs.map((req: any) => `
-              <li class="text-sm text-stone-700 flex items-start gap-3">
-                <svg class="w-5 h-5 text-stone-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>${req}</span>
-              </li>
-            `).join('');
-
-            const bens = Array.isArray(job.benefits) ? job.benefits : [];
-            const benefitsHtml = bens.map((benefit: any) => `
-              <li class="text-sm text-stone-700 flex items-start gap-3">
-                <svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                <span>${benefit}</span>
-              </li>
-            `).join('');
-
-            return `
-              <div class="bg-white border border-stone-200 rounded-3xl p-8 sm:p-12 hover:shadow-md transition-luxury">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-stone-100 pb-8 mb-8">
-                  <div>
-                    <span class="inline-block px-3 py-1 bg-stone-100 text-stone-600 text-[10px] font-mono uppercase tracking-wider rounded-full mb-3">
-                      ${job.type}
-                    </span>
-                    <h3 class="text-2xl font-bold text-stone-900">${job.title}</h3>
-                  </div>
-                  <a 
-                    href="mailto:info@john-haustechnik.de?subject=Bewerbung%20als%20${encodeURIComponent(job.title)}"
-                    class="inline-flex items-center justify-center px-6 h-12 bg-[#ff4c00] hover:bg-[#ff4c00]/90 text-white font-bold text-xs uppercase tracking-widest rounded-full transition-all duration-300"
-                  >
-                    Jetzt formlos bewerben
-                  </a>
-                </div>
-
-                <p class="text-stone-600 text-sm mb-8 leading-relaxed max-w-3xl">
-                  ${job.intro}
-                </p>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                  <div>
-                    <h4 class="text-xs font-mono uppercase tracking-wider text-stone-400 mb-4 font-bold">Was Sie mitbringen:</h4>
-                    <ul class="space-y-3">
-                      ${requirementsHtml}
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 class="text-xs font-mono uppercase tracking-wider text-[#ff4c00] mb-4 font-bold">Was wir bieten:</h4>
-                    <ul class="space-y-3">
-                      ${benefitsHtml}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            `;
-          }).join('');
-        }
-        
-      } catch (err) {
-        console.error("Fehler beim Verarbeiten des lokalen CMS-Caches auf der Startseite:", err);
       }
+    }, { rootMargin: '0px 0px -12% 0px' });
+    document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el));
+
+    // Subtiler Parallax: Hero-Bild leicht mitziehen
+    const img = document.getElementById('hero-img');
+    if (img) {
+      lenis.on('scroll', ({ scroll }: { scroll: number }) => {
+        img.style.transform = `translateY(${scroll * 0.08}px) scale(1.05)`;
+      });
     }
   </script>
-</Layout>
+</Base>

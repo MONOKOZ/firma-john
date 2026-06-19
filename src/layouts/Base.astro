@@ -1,0 +1,20 @@
+---
+import '../styles/redesign.css';
+interface Props { title?: string; description?: string; }
+const {
+  title = "Firma JOHN — Sanitär · Heizung · Solar in Ludwigsfelde",
+  description = "Meisterbetrieb für Sanitär, Heizung, Klima, Wasser, Gas & Solar in Ludwigsfelde. Seit 1979, in 3. Generation. Handwerk von Menschen, die dafür einstehen.",
+} = Astro.props;
+---
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+  </head>
+  <body class="overflow-x-hidden">
+    <slot />
+  </body>
+</html>

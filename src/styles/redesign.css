@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+/* Markentokens (aus Logo abgeleitet — exakte Hex beim Style-Pass pinnen) */
+@theme {
+  --color-john-blue: #1462b8;
+  --color-john-blue-deep: #0e4f99;
+  --color-john-red: #e32219;
+  --color-paper: #f7f7f4;
+  --color-ink: #14181f;
+  --color-mute: #6b7280;
+}
+
+:root { --ease-out: cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* Iteration 1: kräftiger Grotesk-Fallback. Echtes selbst-gehostetes Typeface (DSGVO) im Style-Pass. */
+body {
+  font-family: ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+.font-display {
+  font-family: "Helvetica Neue", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+/* Lenis Smooth-Scroll */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Reveal-Grundzustand — im Design-Sprint deaktiviert (alles sichtbar fürs Review).
+   Polierte Scroll-Reveals kommen in der Animations-Phase. */
+/* [data-reveal] { opacity: 0; transform: translateY(28px); } */
